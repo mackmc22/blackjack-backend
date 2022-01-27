@@ -11,4 +11,4 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView, get_object_or_
 
 @api_view(["GET"])
 def deal(request):
-    return JsonResponse(status=status.HTTP_200_OK)
+    return JsonResponse(data={'key':'value'}, status=status.HTTP_200_OK)

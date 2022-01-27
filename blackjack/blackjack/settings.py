@@ -24,6 +24,7 @@ SECRET_KEY = 'django-insecure--t5tvxg6a)vsqlg7km0+o)@yw!inl+kc04*7o@bmg)8xq#dkax
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+CORS_ORIGIN_ALLOW_ALL = True
 
 ALLOWED_HOSTS = []
 
@@ -31,6 +32,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'rest_framework',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'blackjack.urls'
