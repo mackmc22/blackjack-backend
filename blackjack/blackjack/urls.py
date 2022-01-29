@@ -22,6 +22,6 @@ from api import views
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path("api/game", views.deal, ),
+    path("api/game", views.Game.deal(), ),
 
 ]
