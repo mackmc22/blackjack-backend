@@ -22,15 +22,18 @@ class Game():
 
 @api_view(["GET", "POST", "PUT"])
 def deal(request, id):
-    data = json.loads(request.body)
+
     username = data['username']
     deck = data['deck']
     player_hand = data['player_hand']
     dealer_hand = data['dealer-hand']
 
     # how do I get this into the hand that called the function?
-    card_dealt = Game.deck_cards.pop()
+    card_dealt = new_game.deck_cards.pop()
 
     GameState.objects.create(username=username, deck=deck, player_hand=player_hand, dealer_hand=dealer_hand)
 
     return JsonResponse(data={'card': card_dealt}, status=status.HTTP_200_OK)
+
+
+new_game = Game('id')
