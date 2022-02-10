@@ -19,15 +19,33 @@ class Game:
     def __init__(self):
         random.shuffle(self.deck_cards)
 
+    def deal(self):
+        return self.deck_cards.pop()
+
+
 
 @api_view(["GET", "POST", "PUT"])
 def deal(request, id):
-    # how do I get this into the hand that called the function?
-    card_dealt = new_game.deck_cards.pop()
 
-    GameState.objects.create(username=username, deck=deck, player_hand=player_hand, dealer_hand=dealer_hand)
+
+    #data = json.loads(request.body)
+    #username = data['username']
+
+    db_games = GameState.objects.filter(username='mackenzie').all()
+    if len(db_games) == 0:
+        # how do I get this into the hand that called the function?
+        blackjack_game = Game()
+        card_dealt = blackjack_game.deal()
+
+        GameState.objects.create(username='mackenzie', deck=blackjack_game.deck_cards, player_hand=card_dealt,
+                                 dealer_hand=None)
+    else:
+        db_game = db_games[0]
+        card_dealt = db_game.deck.pop()
+
+
+        #blackjack_game = Game()
+        #blackjack_game.deck_cards = game.deck
+        #card_dealt = blackjack_game.deal()
 
     return JsonResponse(data={'card': card_dealt}, status=status.HTTP_200_OK)
-
-
-new_game = Game()
