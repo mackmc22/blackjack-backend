@@ -43,10 +43,12 @@ def deal(request, id):
         blackjack_game = BlackJackGame()
         blackjack_game.deck_cards = db_deck
         card_dealt = blackjack_game.deal()
-
         db_game.deck = blackjack_game.deck_cards
+
+        #taking the player_hand from the GameState(db_games) and splitting to form a list
         db_hand = db_game.player_hand.split(',')
-        blackjack_game.player_hand = db_hand.append(card_dealt)
+        db_game.player_hand = db_hand.append(card_dealt)
+
         db_game.save()
 
     return JsonResponse(data={'card': card_dealt}, status=status.HTTP_200_OK)
