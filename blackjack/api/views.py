@@ -11,7 +11,7 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView, get_object_or_
 from api.models import GameState
 
 
-class Game:
+class BlackJackGame:
     deck_cards = [2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9,
                   10, 10, 10, 10, 'J', 'J', 'J', 'J', 'Q', 'Q', 'Q', 'Q', 'K', 'K', 'K', 'K', 'A', 'A', 'A', 'A'
                   ]
@@ -23,29 +23,30 @@ class Game:
         return self.deck_cards.pop()
 
 
-
 @api_view(["GET", "POST", "PUT"])
 def deal(request, id):
-
-
-    #data = json.loads(request.body)
-    #username = data['username']
+    # data = json.loads(request.body)
+    # username = data['username']
 
     db_games = GameState.objects.filter(username='mackenzie').all()
     if len(db_games) == 0:
         # how do I get this into the hand that called the function?
-        blackjack_game = Game()
+        blackjack_game = BlackJackGame()
         card_dealt = blackjack_game.deal()
 
         GameState.objects.create(username='mackenzie', deck=blackjack_game.deck_cards, player_hand=card_dealt,
                                  dealer_hand=None)
     else:
+        # triggering if we have a game that we should deal from
         db_game = db_games[0]
-        card_dealt = db_game.deck.pop()
+        db_deck = db_game.deck.split(',')
+        blackjack_game = BlackJackGame()
+        blackjack_game.deck_cards = db_deck
+        card_dealt = blackjack_game.deal()
 
-
-        #blackjack_game = Game()
-        #blackjack_game.deck_cards = game.deck
-        #card_dealt = blackjack_game.deal()
+        db_game.deck = blackjack_game.deck_cards
+        db_hand = db_game.player_hand.split(',')
+        blackjack_game.player_hand = db_hand.append(card_dealt)
+        db_game.save()
 
     return JsonResponse(data={'card': card_dealt}, status=status.HTTP_200_OK)
