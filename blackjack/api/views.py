@@ -34,7 +34,8 @@ def deal(request, id):
         blackjack_game = BlackJackGame()
         card_dealt = blackjack_game.deal()
 
-        GameState.objects.create(username='mackenzie', deck=json.dumps(blackjack_game.deck_cards), player_hand=json.dumps([card_dealt]),
+        GameState.objects.create(username='mackenzie', deck=json.dumps(blackjack_game.deck_cards),
+                                 player_hand=json.dumps([card_dealt]),
                                  dealer_hand=None)
     else:
         # triggering if we have a game that we should deal from
@@ -45,10 +46,11 @@ def deal(request, id):
         card_dealt = blackjack_game.deal()
         db_game.deck = json.dumps(blackjack_game.deck_cards)
 
-        #taking the player_hand from the GameState(db_games) and splitting to form a list
+        # nowhere do i declare db_hand as a list...
         db_hand = json.loads(db_game.player_hand)
         db_hand.append(card_dealt)
         db_game.player_hand = json.dumps(db_hand)
+
         db_game.save()
 
-    return JsonResponse(data={'card': card_dealt}, status=status.HTTP_200_OK)
+    return JsonResponse(data={'hand': db_hand}, status=status.HTTP_200_OK)
