@@ -28,13 +28,15 @@ def deal(request, id):
     # data = json.loads(request.body)
     # username = data['username']
 
+    db_hand = []
     db_games = GameState.objects.filter(username='mackenzie').all()
     if len(db_games) == 0:
         # how do I get this into the hand that called the function?
         blackjack_game = BlackJackGame()
         card_dealt = blackjack_game.deal()
+        db_hand.append(card_dealt)
 
-        GameState.objects.create(username='mackenzie', deck=json.dumps(blackjack_game.deck_cards), player_hand=json.dumps([card_dealt]),
+        GameState.objects.create(username='mackenzie', deck=json.dumps(blackjack_game.deck_cards), player_hand=json.dumps(db_hand),
                                  dealer_hand=None)
     else:
         # triggering if we have a game that we should deal from
