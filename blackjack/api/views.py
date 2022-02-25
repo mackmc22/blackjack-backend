@@ -1,12 +1,10 @@
-import pdb
+import json
 import json
 import random
 
-from django.http import HttpResponse, JsonResponse
-
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.generics import ListAPIView, RetrieveAPIView, get_object_or_404
 
 from api.models import GameState
 
@@ -47,7 +45,7 @@ def deal(request, id):
         card_dealt = blackjack_game.deal()
         db_game.deck = json.dumps(blackjack_game.deck_cards)
 
-        #nowhere do i declare db_hand as a list...
+        # nowhere do i declare db_hand as a list...
         db_hand = json.loads(db_game.player_hand)
         db_hand.append(card_dealt)
         db_game.player_hand = json.dumps(db_hand)
