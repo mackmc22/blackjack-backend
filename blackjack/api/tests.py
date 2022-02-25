@@ -20,4 +20,4 @@ class TestMyEndpoint(TestCase):
 
         # the json in the response should contain a 'card' key in the dictionary
         # this test should probably be updated if the 'card' is not being returned
-        self.assertTrue('card' in response_data)
+        self.assertTrue('hand' in response_data)
