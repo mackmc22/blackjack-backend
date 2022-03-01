@@ -34,7 +34,8 @@ def deal(request, id):
         card_dealt = blackjack_game.deal()
         db_hand.append(card_dealt)
 
-        GameState.objects.create(username='mackenzie', deck=json.dumps(blackjack_game.deck_cards), player_hand=json.dumps(db_hand),
+        GameState.objects.create(username='mackenzie', deck=json.dumps(blackjack_game.deck_cards),
+                                 player_hand=json.dumps(db_hand),
                                  dealer_hand=None)
     else:
         # triggering if we have a game that we should deal from
@@ -53,3 +54,9 @@ def deal(request, id):
         db_game.save()
 
     return JsonResponse(data={'hand': db_hand}, status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+def restart_game(request, username):
+    record = GameState.objects.get(username='mackenzie')
+    record.delete()
