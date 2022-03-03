@@ -56,7 +56,8 @@ def deal(request, id):
     return JsonResponse(data={'hand': db_hand}, status=status.HTTP_200_OK)
 
 
-@api_view(["POST"])
+@api_view(["DELETE"])
 def restart_game(request, username):
     record = GameState.objects.get(username='mackenzie')
     record.delete()
+    print('restarting')

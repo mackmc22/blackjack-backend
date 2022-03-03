@@ -29,8 +29,21 @@ class TestMyEndpoint(TestCase):
 
         self.assertEqual(len(response_data['hand']), 2)
 
-    def test_reset_endpoint(self):
+    def test_restart_endpoint(self):
+        client = APIClient()
+        url = reverse('deal', args=(123,))
+        url_restart = reverse('restart', args=(123,))
+
         # 1. Call the deal endpoint (make sure there's a card in there)
+        response = client.get(url)
+        response_data = response.json()
+        self.assertGreaterEqual(len(response_data['hand']), 1)
+
         # 2. Call reset endpoint (and make sure it returns 200)
+        response = client.delete(url_restart)
+        self.assertEqual(response.status_code, 200)
+
         # 3. Call the deal endpoint again (make sure theres only one card)        
-        pass
+        response = client.get(url)
+        response_data = response.json()
+        self.assertEqual(len(response_data['hand']), 1)
