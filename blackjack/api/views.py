@@ -2,7 +2,7 @@ import json
 import json
 import random
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 
@@ -57,7 +57,8 @@ def deal(request, id):
 
 
 @api_view(["DELETE"])
-def restart_game(request, username):
+def restart_game(request, id):
     record = GameState.objects.get(username='mackenzie')
     record.delete()
-    print('restarting')
+
+    return HttpResponse(status=status.HTTP_200_OK)

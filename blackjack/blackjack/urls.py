@@ -22,6 +22,6 @@ from api import views
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path("api/game/<int:id>", views.deal, name='deal'),
-    path("api/game/<int:id>", views.restart_game, name='restart'),
+    path("api/game/<int:id>/deal", views.deal, name='deal'),
+    path("api/game/<int:id>/restart", views.restart_game, name='restart'),
 ]
