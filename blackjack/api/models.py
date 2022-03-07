@@ -6,3 +6,5 @@ class GameState(models.Model):
     deck = models.TextField(null=True)
     player_hand = models.TextField()
     dealer_hand = models.TextField(null=True)
+    active = models.BooleanField(default=True)
+    winner = models.TextField(null=True)

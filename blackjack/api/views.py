@@ -20,6 +20,9 @@ class BlackJackGame:
     def deal(self):
         return self.deck_cards.pop()
 
+def calculate_cards(hand):
+    pass
+
 
 @api_view(["GET", "POST", "PUT"])
 def deal(request, id):
@@ -34,9 +37,8 @@ def deal(request, id):
         card_dealt = blackjack_game.deal()
         db_hand.append(card_dealt)
 
-        GameState.objects.create(username='mackenzie', deck=json.dumps(blackjack_game.deck_cards),
-                                 player_hand=json.dumps(db_hand),
-                                 dealer_hand=None)
+        db_game = GameState.objects.create(username='mackenzie', deck=json.dumps(blackjack_game.deck_cards),
+                                 player_hand=json.dumps(db_hand))
     else:
         # triggering if we have a game that we should deal from
         db_game = db_games[0]
@@ -53,8 +55,15 @@ def deal(request, id):
 
         db_game.save()
 
-    return JsonResponse(data={'hand': db_hand}, status=status.HTTP_200_OK)
+    # 1. fill out the definition of calculate cards
+    score = calculate_cards(db_hand)
+    # 2. based on the score, how does it affect the two columns (active, winner)?
+    db_game.active =
+    db_game.winner
+    # 3. DONT FORGET TO CALL SAVE
+    # 4. return the winner
 
+    return JsonResponse(data={'hand': db_hand, 'score': score}, status=status.HTTP_200_OK)
 
 @api_view(["DELETE"])
 def restart_game(request, id):
