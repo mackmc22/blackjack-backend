@@ -20,8 +20,38 @@ class BlackJackGame:
     def deal(self):
         return self.deck_cards.pop()
 
-def calculate_cards(hand):
-    pass
+    hand = []
+    card_total = 0
+
+    def calculate_cards(self, hand):
+        self.card_total = 0
+
+        self.sort_cards_save_to_cards(hand)
+
+        for card in self.hand:
+            if card in ['J', 'Q', 'K']:
+                card = 10
+            if card == 'A':
+                if self.card_total > 10:
+                    card = 1
+                else:
+                    card = 11
+
+            self.card_total = card + self.card_total
+
+        return self.card_total
+
+    def sort_cards_save_to_cards(self, hand):
+        non_aces = []
+        all_aces = []
+
+        for card in hand:
+            if card == 'A':
+                all_aces.append(card)
+            else:
+                non_aces.append(card)
+
+        self.hand = non_aces + all_aces
 
 
 @api_view(["GET", "POST", "PUT"])
@@ -38,7 +68,7 @@ def deal(request, id):
         db_hand.append(card_dealt)
 
         db_game = GameState.objects.create(username='mackenzie', deck=json.dumps(blackjack_game.deck_cards),
-                                 player_hand=json.dumps(db_hand))
+                                           player_hand=json.dumps(db_hand))
     else:
         # triggering if we have a game that we should deal from
         db_game = db_games[0]
@@ -48,7 +78,6 @@ def deal(request, id):
         card_dealt = blackjack_game.deal()
         db_game.deck = json.dumps(blackjack_game.deck_cards)
 
-        # nowhere do i declare db_hand as a list...
         db_hand = json.loads(db_game.player_hand)
         db_hand.append(card_dealt)
         db_game.player_hand = json.dumps(db_hand)
@@ -56,14 +85,19 @@ def deal(request, id):
         db_game.save()
 
     # 1. fill out the definition of calculate cards
-    score = calculate_cards(db_hand)
+    score = blackjack_game.calculate_cards(db_hand)
     # 2. based on the score, how does it affect the two columns (active, winner)?
-    db_game.active =
-    db_game.winner
-    # 3. DONT FORGET TO CALL SAVE
+    if score >= 21:
+        db_game.active = False
+        db_game.winner = 'player'
+        print(db_game.winner)
+
+    # 3. DON'T FORGET TO CALL SAVE
+    db_game.save()
     # 4. return the winner
 
-    return JsonResponse(data={'hand': db_hand, 'score': score}, status=status.HTTP_200_OK)
+    return JsonResponse(data={'hand': db_hand, 'score': score, 'winner': db_game.winner}, status=status.HTTP_200_OK)
+
 
 @api_view(["DELETE"])
 def restart_game(request, id):
