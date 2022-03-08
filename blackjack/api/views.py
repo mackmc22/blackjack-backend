@@ -72,6 +72,10 @@ def deal(request, id):
     else:
         # triggering if we have a game that we should deal from
         db_game = db_games[0]
+
+        if not db_game.active:
+            return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+
         db_deck = json.loads(db_game.deck)
         blackjack_game = BlackJackGame()
         blackjack_game.deck_cards = db_deck
@@ -87,10 +91,15 @@ def deal(request, id):
     # 1. fill out the definition of calculate cards
     score = blackjack_game.calculate_cards(db_hand)
     # 2. based on the score, how does it affect the two columns (active, winner)?
-    if score >= 21:
+
+    if score == 21:
         db_game.active = False
         db_game.winner = 'player'
-        print(db_game.winner)
+    if score > 21:
+        db_game.active = False
+        db_game.winner = 'dealer'
+
+    print(db_game.winner)
 
     # 3. DON'T FORGET TO CALL SAVE
     db_game.save()
