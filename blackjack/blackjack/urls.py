@@ -22,6 +22,8 @@ from api import views
 urlpatterns = [
     path('admin/', admin.site.urls),
 
+    # 1. create a stand endpoint
+
     path("api/game/<int:id>/deal", views.deal, name='deal'),
     path("api/game/<int:id>/restart", views.restart_game, name='restart'),
 ]

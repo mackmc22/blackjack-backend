@@ -20,26 +20,23 @@ class BlackJackGame:
     def deal(self):
         return self.deck_cards.pop()
 
-    hand = []
-    card_total = 0
-
     def calculate_cards(self, hand):
-        self.card_total = 0
+        card_total = 0
 
-        self.sort_cards_save_to_cards(hand)
+        hand = self.sort_cards_save_to_cards(hand)
 
-        for card in self.hand:
+        for card in hand:
             if card in ['J', 'Q', 'K']:
                 card = 10
             if card == 'A':
-                if self.card_total > 10:
+                if card_total > 10:
                     card = 1
                 else:
                     card = 11
 
-            self.card_total = card + self.card_total
+            card_total = card + card_total
 
-        return self.card_total
+        return card_total
 
     def sort_cards_save_to_cards(self, hand):
         non_aces = []
@@ -51,7 +48,7 @@ class BlackJackGame:
             else:
                 non_aces.append(card)
 
-        self.hand = non_aces + all_aces
+        return non_aces + all_aces
 
 
 @api_view(["GET", "POST", "PUT"])
