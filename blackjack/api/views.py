@@ -85,9 +85,7 @@ def deal(request, id):
 
         db_game.save()
 
-    # 1. fill out the definition of calculate cards
     score = blackjack_game.calculate_cards(db_hand)
-    # 2. based on the score, how does it affect the two columns (active, winner)?
 
     if score == 21:
         db_game.active = False
@@ -115,6 +113,8 @@ def restart_game(request, id):
 
 @api_view(["PUT"])
 def stand(request, id):
+    score = 0
+
     # find the existing game based on username
     db_games = GameState.objects.filter(username='mackenzie').all()
     db_game = db_games[0]
@@ -124,3 +124,38 @@ def stand(request, id):
     blackjack_game = BlackJackGame()
     # load deck from GameState into new game instance
     blackjack_game.deck_cards = db_deck
+
+    # deal card and add to dealer's hand
+    card_dealt = blackjack_game.deal()
+    db_hand = json.loads(db_game.dealer_hand)
+    db_hand.append(card_dealt)
+    db_game.dealer_hand = json.dumps(db_hand)
+
+    db_game.save()
+
+    score = blackjack_game.calculate_cards(db_hand)
+
+    while True:
+        if score == 21:
+            db_game.active = False
+            db_game.winner = 'dealer'
+            break
+        if score > 21:
+            db_game.active = False
+            db_game.winner = 'player'
+            break
+
+        # if dealer's cards <16, dealer hits
+        if score < 16:
+            card_dealt = blackjack_game.deal()
+            db_hand = json.loads(db_game.dealer_hand)
+            db_hand.append(card_dealt)
+            db_game.dealer_hand = json.dumps(db_hand)
+
+            db_game.save()
+
+            score = blackjack_game.calculate_cards(db_hand)
+
+        return JsonResponse(data={'hand': db_hand, 'score': score, 'winner': db_game.winner}, status=status.HTTP_200_OK)
+
+
