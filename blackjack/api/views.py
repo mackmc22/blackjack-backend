@@ -111,3 +111,16 @@ def restart_game(request, id):
     record.delete()
 
     return HttpResponse(status=status.HTTP_200_OK)
+
+
+@api_view(["PUT"])
+def stand(request, id):
+    # find the existing game based on username
+    db_games = GameState.objects.filter(username='mackenzie').all()
+    db_game = db_games[0]
+    # pull deck from GameState
+    db_deck = json.loads(db_game.deck)
+    # create new instance of the game
+    blackjack_game = BlackJackGame()
+    # load deck from GameState into new game instance
+    blackjack_game.deck_cards = db_deck
