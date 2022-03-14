@@ -125,28 +125,32 @@ def stand(request, id):
     # load deck from GameState into new game instance
     blackjack_game.deck_cards = db_deck
 
+    #considerign making this into an inner function?
     # deal card and add to dealer's hand
     card_dealt = blackjack_game.deal()
-    db_hand = json.loads(db_game.dealer_hand)
-    db_hand.append(card_dealt)
-    db_game.dealer_hand = json.dumps(db_hand)
+    db_dealer_hand = json.loads(db_game.dealer_hand)
+    db_dealer_hand.append(card_dealt)
+    db_game.dealer_hand = json.dumps(db_dealer_hand)
+    db_player_hand = json.loads(db_game.player_hand)
+
 
     db_game.save()
 
-    score = blackjack_game.calculate_cards(db_hand)
+    dealer_score = blackjack_game.calculate_cards(db_dealer_hand)
 
     while True:
-        if score == 21:
+        if dealer_score == 21:
             db_game.active = False
             db_game.winner = 'dealer'
             break
-        if score > 21:
+
+        if dealer_score > 21:
             db_game.active = False
             db_game.winner = 'player'
             break
 
         # if dealer's cards <16, dealer hits
-        if score < 16:
+        if dealer_score < 16:
             card_dealt = blackjack_game.deal()
             db_hand = json.loads(db_game.dealer_hand)
             db_hand.append(card_dealt)
@@ -154,8 +158,20 @@ def stand(request, id):
 
             db_game.save()
 
-            score = blackjack_game.calculate_cards(db_hand)
+            dealer_score = blackjack_game.calculate_cards(db_dealer_hand)
 
-        return JsonResponse(data={'hand': db_hand, 'score': score, 'winner': db_game.winner}, status=status.HTTP_200_OK)
+        if score >= 17:
+            db_game.active = False
+            player_score = blackjack_game.calculate_cards(db_player_hand)
+
+            if player_score >= dealer_score:
+                db_game.winner = 'player'
+            else:
+                db_game.winner = 'dealer'
+
+
+
+
+        return JsonResponse(data={'hand': db_dealer_hand, 'score': dealer_score, 'winner': db_game.winner}, status=status.HTTP_200_OK)
 
 
