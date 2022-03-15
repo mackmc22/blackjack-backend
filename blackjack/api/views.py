@@ -111,9 +111,10 @@ def restart_game(request, id):
     return HttpResponse(status=status.HTTP_200_OK)
 
 
-@api_view(["PUT"])
+@api_view(["GET", "PUT"])
 def stand(request, id):
     score = 0
+    dealer_hand = []
 
     # find the existing game based on username
     db_games = GameState.objects.filter(username='mackenzie').all()
@@ -125,53 +126,54 @@ def stand(request, id):
     # load deck from GameState into new game instance
     blackjack_game.deck_cards = db_deck
 
-    #considerign making this into an inner function?
+    # considerign making this into an inner function?
     # deal card and add to dealer's hand
     card_dealt = blackjack_game.deal()
-    db_dealer_hand = json.loads(db_game.dealer_hand)
-    db_dealer_hand.append(card_dealt)
-    db_game.dealer_hand = json.dumps(db_dealer_hand)
+    dealer_hand.append(card_dealt)
+    print(dealer_hand)
+    # I don't think i need to do this here with only one card
+    db_game.dealer_hand = json.dumps(dealer_hand)
     db_player_hand = json.loads(db_game.player_hand)
-
 
     db_game.save()
 
-    dealer_score = blackjack_game.calculate_cards(db_dealer_hand)
-
+    dealer_score = blackjack_game.calculate_cards(dealer_hand)
+    print(dealer_score)
     while True:
         if dealer_score == 21:
             db_game.active = False
             db_game.winner = 'dealer'
             break
 
-        if dealer_score > 21:
+        elif dealer_score > 21:
             db_game.active = False
             db_game.winner = 'player'
             break
 
         # if dealer's cards <16, dealer hits
-        if dealer_score < 16:
+        elif dealer_score <= 16:
             card_dealt = blackjack_game.deal()
-            db_hand = json.loads(db_game.dealer_hand)
-            db_hand.append(card_dealt)
-            db_game.dealer_hand = json.dumps(db_hand)
+            dealer_hand.append(card_dealt)
+            print(dealer_hand)
+            # I don't think I need to do this until the game is over...
+            db_game.dealer_hand = json.dumps(dealer_hand)
 
             db_game.save()
 
-            dealer_score = blackjack_game.calculate_cards(db_dealer_hand)
-
-        if score >= 17:
+            dealer_score = blackjack_game.calculate_cards(dealer_hand)
+            print(dealer_score)
+        elif dealer_score >= 17:
             db_game.active = False
             player_score = blackjack_game.calculate_cards(db_player_hand)
-
+            print(player_score)
+            print(dealer_score)
             if player_score >= dealer_score:
                 db_game.winner = 'player'
             else:
                 db_game.winner = 'dealer'
 
+            db_game.save()
+            break
 
-
-
-        return JsonResponse(data={'hand': db_dealer_hand, 'score': dealer_score, 'winner': db_game.winner}, status=status.HTTP_200_OK)
-
-
+    return JsonResponse(data={'hand': dealer_hand, 'winner': db_game.winner},
+                        status=status.HTTP_200_OK)
