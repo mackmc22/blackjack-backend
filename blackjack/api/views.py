@@ -20,26 +20,23 @@ class BlackJackGame:
     def deal(self):
         return self.deck_cards.pop()
 
-    hand = []
-    card_total = 0
-
     def calculate_cards(self, hand):
-        self.card_total = 0
+        card_total = 0
 
-        self.sort_cards_save_to_cards(hand)
+        hand = self.sort_cards_save_to_cards(hand)
 
-        for card in self.hand:
+        for card in hand:
             if card in ['J', 'Q', 'K']:
                 card = 10
             if card == 'A':
-                if self.card_total > 10:
+                if card_total > 10:
                     card = 1
                 else:
                     card = 11
 
-            self.card_total = card + self.card_total
+            card_total = card + card_total
 
-        return self.card_total
+        return card_total
 
     def sort_cards_save_to_cards(self, hand):
         non_aces = []
@@ -51,7 +48,7 @@ class BlackJackGame:
             else:
                 non_aces.append(card)
 
-        self.hand = non_aces + all_aces
+        return non_aces + all_aces
 
 
 @api_view(["GET", "POST", "PUT"])
@@ -88,9 +85,7 @@ def deal(request, id):
 
         db_game.save()
 
-    # 1. fill out the definition of calculate cards
     score = blackjack_game.calculate_cards(db_hand)
-    # 2. based on the score, how does it affect the two columns (active, winner)?
 
     if score == 21:
         db_game.active = False
@@ -114,3 +109,71 @@ def restart_game(request, id):
     record.delete()
 
     return HttpResponse(status=status.HTTP_200_OK)
+
+
+@api_view(["GET", "PUT"])
+def stand(request, id):
+    score = 0
+    dealer_hand = []
+
+    # find the existing game based on username
+    db_games = GameState.objects.filter(username='mackenzie').all()
+    db_game = db_games[0]
+    # pull deck from GameState
+    db_deck = json.loads(db_game.deck)
+    # create new instance of the game
+    blackjack_game = BlackJackGame()
+    # load deck from GameState into new game instance
+    blackjack_game.deck_cards = db_deck
+
+    # considerign making this into an inner function?
+    # deal card and add to dealer's hand
+    card_dealt = blackjack_game.deal()
+    dealer_hand.append(card_dealt)
+    print(dealer_hand)
+    # I don't think i need to do this here with only one card
+    db_game.dealer_hand = json.dumps(dealer_hand)
+    db_player_hand = json.loads(db_game.player_hand)
+
+    db_game.save()
+
+    dealer_score = blackjack_game.calculate_cards(dealer_hand)
+    print(dealer_score)
+    while True:
+        if dealer_score == 21:
+            db_game.active = False
+            db_game.winner = 'dealer'
+            break
+
+        elif dealer_score > 21:
+            db_game.active = False
+            db_game.winner = 'player'
+            break
+
+        # if dealer's cards <16, dealer hits
+        elif dealer_score <= 16:
+            card_dealt = blackjack_game.deal()
+            dealer_hand.append(card_dealt)
+            print(dealer_hand)
+            # I don't think I need to do this until the game is over...
+            db_game.dealer_hand = json.dumps(dealer_hand)
+
+            db_game.save()
+
+            dealer_score = blackjack_game.calculate_cards(dealer_hand)
+            print(dealer_score)
+        elif dealer_score >= 17:
+            db_game.active = False
+            player_score = blackjack_game.calculate_cards(db_player_hand)
+            print(player_score)
+            print(dealer_score)
+            if player_score >= dealer_score:
+                db_game.winner = 'player'
+            else:
+                db_game.winner = 'dealer'
+
+            db_game.save()
+            break
+
+    return JsonResponse(data={'hand': dealer_hand, 'winner': db_game.winner},
+                        status=status.HTTP_200_OK)
