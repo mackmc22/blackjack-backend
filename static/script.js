@@ -2,7 +2,7 @@
 
 
 function deal() {
-    axios.get("http://127.0.0.1:8000/api/game/234/deal")
+    axios.get("/api/game/234/deal")
         .then(d => d.data)
         .then(data => {
             let player_cards = document.querySelector("#player_cards");
@@ -19,7 +19,7 @@ hitButton.onclick = () => deal();
 
 
 function restart_game(){
-    axios.delete("http://127.0.0.1:8000/api/game/234/restart").then(() => {
+    axios.delete("/api/game/234/restart").then(() => {
         window.location.reload();
     });
 }
@@ -29,7 +29,7 @@ restartButton.onclick = () => restart_game();
 
 
 function stand(){
-    axios.get("http://127.0.0.1:8000/api/game/234/stand")
+    axios.get("/api/game/234/stand")
         .then(d => d.data)
         .then(data => {
             let dealer_cards = document.querySelector("#dealer_cards");
