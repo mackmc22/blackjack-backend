@@ -1,0 +1,25 @@
+{
+  "name": "blackjack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "format": "prettier --write ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mackmc22/blackjack.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mackmc22/blackjack/issues"
+  },
+  "homepage": "https://github.com/mackmc22/blackjack#readme",
+  "devDependencies": {
+    "prettier": "2.5.1"
+  },
+  "dependencies": {
+    "axios": "^0.25.0"
+  }
+}

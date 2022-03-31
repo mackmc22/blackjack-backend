@@ -3,10 +3,15 @@ import json
 import random
 
 from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 
 from api.models import GameState
+
+
+def index(request):
+    return render(request, "static/index.html")
 
 
 class BlackJackGame:
