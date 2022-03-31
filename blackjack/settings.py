@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure--t5tvxg6a)vsqlg7km0+o)@yw!inl+kc04*7o@bmg)8xq#dkax
 DEBUG = True
 CORS_ORIGIN_ALLOW_ALL = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["game-of-blackjack.herokuapp.com"]
 
 
 # Application definition
