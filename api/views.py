@@ -129,18 +129,14 @@ def stand(request, id):
 
     db_player_hand = json.loads(db_game.player_hand)
 
-    db_game.save()
-
     dealer_score = blackjack_game.calculate_cards(dealer_hand)
 
     while True:
         if dealer_score == 21:
-            db_game.active = False
             db_game.winner = 'dealer'
             break
 
         elif dealer_score > 21:
-            db_game.active = False
             db_game.winner = 'player'
             break
 
@@ -149,14 +145,9 @@ def stand(request, id):
             card_dealt = blackjack_game.deal()
             dealer_hand.append(card_dealt)
 
-            db_game.dealer_hand = json.dumps(dealer_hand)
-
-            db_game.save()
-
             dealer_score = blackjack_game.calculate_cards(dealer_hand)
 
         elif dealer_score >= 17:
-            db_game.active = False
             player_score = blackjack_game.calculate_cards(db_player_hand)
 
             if player_score >= dealer_score:
@@ -164,8 +155,11 @@ def stand(request, id):
             else:
                 db_game.winner = 'dealer'
 
-            db_game.save()
             break
 
+    db_game.dealer_hand = json.dumps(dealer_hand)
+    db_game.active = False
+    db_game.save()
+    
     return JsonResponse(data={'hand': dealer_hand, 'winner': db_game.winner},
                         status=status.HTTP_200_OK)
